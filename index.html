@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <!-- iPhone用アイコン設定 -->
+    <link rel="apple-touch-icon" href="ferrari.jpg">
+    
+    <!-- iPhoneでアプリっぽく見せるための追加設定 -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <title>語尾コンバーター</title>
+    
+    <style>
+        body { font-family: 'Helvetica Neue', Arial, sans-serif; padding: 20px; line-height: 1.6; background: #f4f7f6; color: #333; }
+        .container { max-width: 650px; margin: 0 auto; background: white; padding: 30px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        h2 { text-align: center; color: #2c3e50; margin-top: 0; border-bottom: 2px solid #007bff; padding-bottom: 10px; }
+        textarea { width: 100%; height: 120px; margin-bottom: 15px; border: 2px solid #ddd; border-radius: 8px; padding: 12px; box-sizing: border-box; font-size: 16px; resize: vertical; }
+        textarea:focus { border-color: #007bff; outline: none; }
+        .buttons { display: grid; grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); gap: 10px; margin-bottom: 20px; }
+        button { padding: 12px 10px; cursor: pointer; border: none; border-radius: 6px; background: #007bff; color: white; font-weight: bold; transition: 0.2s; -webkit-appearance: none; }
+        button:hover { background: #0056b3; transform: translateY(-1px); }
+        .result-label { font-size: 0.9em; color: #7f8c8d; margin-bottom: 5px; }
+        #result { background: #e9ecef; padding: 20px; border-radius: 8px; min-height: 60px; white-space: pre-wrap; font-size: 1.2em; border-left: 5px solid #007bff; font-weight: bold; }
+        .copy-btn { margin-top: 15px; width: 100%; background: #28a745; font-size: 1.1em; }
+        .copy-btn:hover { background: #218838; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>語尾変換マシーン</h2>
+    <textarea id="inputText" placeholder="「何時集合？」など入力してね"></textarea>
+    
+    <div class="buttons">
+        <button onclick="exec('cat')">猫</button>
+        <button onclick="exec('dog')">犬</button>
+        <button onclick="exec('samurai')">侍</button>
+        <button onclick="exec('nanoda')">バカボン</button>
+        <button onclick="exec('gorilla')">ゴリラ</button>
+        <button onclick="exec('dearu')">ロボ</button>
+        <button onclick="exec('ojou')">お嬢様</button>
+    </div>
+
+    <div class="result-label">変換結果：</div>
+    <div id="result">ここに結果が表示されるニャ！</div>
+    
+    <!-- コピーボタンを追加 -->
+    <button class="copy-btn" id="copyBtn" onclick="copyToClipboard()">結果をコピーする</button>
+</div>
+
+<script>
+function transformSpeech(text, mode) {
+    if (!text) return "何か入力するのだ！";
+    let result = text;
+
+    switch (mode) {
+        case "cat":
+            result = text.replace(/な/g, "にゃ").replace(/[ですだ]([。！!？? \n]|$)/g, "にゃ$1").replace(/ます([。！!？? \n]|$)/g, "にゃす$1");
+            if (!/[にゃニャ][。！!？? \n]*$/.test(result)) result = result.replace(/([。！!？? \n]|$)/, "ニャー$1");
+            break;
+        case "dog":
+            result = text.replace(/[ですますだ]/g, "");
+            if (!/ワン/.test(result)) result = result.replace(/([。！!？? \n]|$)/, "ワン！$1");
+            break;
+        case "samurai":
+            result = text.replace(/私|僕|俺/g, "拙者").replace(/[？?]/g, "でござるか？").replace(/です([。！! \n]|$)/g, "でござる$1").replace(/ます([。！! \n]|$)/g, "るでござる$1").replace(/だ([。！! \n]|$)/g, "である$1");
+            if (!/(でござる|である|[か？?])$/.test(result.trim())) result = result.replace(/([。！! \n]|$)/, "でござる$1");
+            break;
+        case "nanoda":
+            result = text.replace(/[ですだ]([。！!？? \n]|$)/g, "なのだ！$1").replace(/ます([。！!？? \n]|$)/g, "るのだ！$1");
+            if (!/なのだ/.test(result)) result = result.replace(/([。！!？? \n]|$)/, "なのだ！$1");
+            break;
+        case "gorilla":
+            result = text.replace(/[。]/g, "。ウホッ。");
+            if (!/ウホッ/.test(result)) result = result.replace(/([！!？? \n]|$)/, "ウホッ！$1");
+            break;
+        case "dearu":
+            result = text.replace(/です|だ/g, "である").replace(/ます/g, "るのである").replace(/[？?]/g, "であるか？");
+            if (!/である/.test(result)) result = result.replace(/([。！! \n]|$)/, "である$1");
+            break;
+        case "ojou":
+            result = text.replace(/私|僕|俺/g, "わたくし").replace(/[？?]/g, "ですの？").replace(/です([。！! \n]|$)/g, "ですわ$1").replace(/ます([。！! \n]|$)/g, "ますのよ$1").replace(/だ([。！! \n]|$)/g, "ですわ$1");
+            if (!/(ですわ|ますのよ|ですの？)$/.test(result.trim())) result = result.replace(/([。！! \n]|$)/, "ですわ$1");
+            result = result.replace(/[。]/g, "。おーっほっほっほ！");
+            break;
+    }
+
+    return result
+        .replace(/(ニャー)+/g, "ニャー").replace(/(ワン！)+/g, "ワン！").replace(/(でござる)+/g, "でござる")
+        .replace(/(なのだ！)+/g, "なのだ！").replace(/(ウホッ！)+/g, "ウホッ！").replace(/(である)+/g, "である")
+        .replace(/(ですわ)+/g, "ですわ").replace(/でござるか？でござる/g, "でござるか？")
+        .replace(/であるか？である/g, "であるか？").replace(/ですの？ですわ/g, "ですの？");
+}
+
+function exec(mode) {
+    const input = document.getElementById('inputText').value;
+    const result = transformSpeech(input, mode);
+    document.getElementById('result').innerText = result;
+}
+
+function copyToClipboard() {
+    const resultText = document.getElementById('result').innerText;
+    const copyBtn = document.getElementById('copyBtn');
+    
+    navigator.clipboard.writeText(resultText).then(() => {
+        const originalText = copyBtn.innerText;
+        copyBtn.innerText = "コピーしました！";
+        copyBtn.style.background = "#2ecc71";
+        
+        setTimeout(() => {
+            copyBtn.innerText = originalText;
+            copyBtn.style.background = "#28a745";
+        }, 2000);
+    }).catch(err => {
+        alert("コピーに失敗したでござる！");
+    });
+}
+</script>
+
+</body>
+</html>
